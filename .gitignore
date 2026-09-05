@@ -194,3 +194,8 @@ dist
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,node,visualstudiocode
+# ignore content of uploads folder
+uploads/*
+
+# except one empty file to keep the folder in git
+!uploads/.gitkeep

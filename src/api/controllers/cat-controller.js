@@ -1,11 +1,11 @@
 import {listAllCats, findCatById, addCat} from '../models/cat-model.js';
 
-// Get all cats
+// all cats
 const getCats = (req, res) => {
   res.json(listAllCats());
 };
 
-// Get one cat by id
+// Get cat id by one
 const getCatById = (req, res) => {
   const cat = findCatById(req.params.id);
 
@@ -16,8 +16,14 @@ const getCatById = (req, res) => {
   }
 };
 
-// Add a new cat
 const postCat = (req, res) => {
+  console.log('Form data:', req.body);
+  console.log('File data:', req.file);
+
+  if (req.file) {
+    req.body.filename = req.file.filename;
+  }
+
   const result = addCat(req.body);
 
   if (result.cat_id) {
@@ -37,7 +43,7 @@ const putCat = (req, res) => {
   });
 };
 
-// Delete cat
+// Del the cat
 const deleteCat = (req, res) => {
   res.json({
     message: 'Cat item deleted.',
