@@ -1,53 +1,109 @@
-import {listAllCats, findCatById, addCat} from '../models/cat-model.js';
+import {
+  listAllCats,
+  findCatById,
+  findCatsByUserId,
+  addCat,
+  modifyCat,
+  removeCat,
+} from '../models/cat-model.js';
 
-// all cats
-const getCats = (req, res) => {
-  res.json(listAllCats());
+const getCats = async (req, res) => {
+  try {
+    const cats = await listAllCats();
+    res.json(cats);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({message: 'Could not get cats.'});
+  }
 };
 
-// Get cat id by one
-const getCatById = (req, res) => {
-  const cat = findCatById(req.params.id);
+const getCatById = async (req, res) => {
+  try {
+    const cat = await findCatById(req.params.id);
 
-  if (cat) {
+    if (!cat) {
+      res.sendStatus(404);
+      return;
+    }
+
     res.json(cat);
-  } else {
-    res.sendStatus(404);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({message: 'Could not get cat.'});
   }
 };
 
-const postCat = (req, res) => {
-  console.log('Form data:', req.body);
-  console.log('File data:', req.file);
-
-  if (req.file) {
-    req.body.filename = req.file.filename;
+const getCatsByUserId = async (req, res) => {
+  try {
+    const cats = await findCatsByUserId(req.params.id);
+    res.json(cats);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({message: 'Could not get user cats.'});
   }
+};
 
-  const result = addCat(req.body);
+const postCat = async (req, res) => {
+  try {
+    if (req.file) {
+      req.body.filename = req.file.filename;
+    }
 
-  if (result.cat_id) {
+    const result = await addCat(req.body);
+
+    if (!result) {
+      res.sendStatus(400);
+      return;
+    }
+
     res.status(201).json({
       message: 'New cat added.',
       result,
     });
-  } else {
-    res.sendStatus(400);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({message: 'Could not add cat.'});
   }
 };
 
-// Update cat
-const putCat = (req, res) => {
-  res.json({
-    message: 'Cat item updated.',
-  });
+const putCat = async (req, res) => {
+  try {
+    if (req.file) {
+      req.body.filename = req.file.filename;
+    }
+
+    const updated = await modifyCat(req.body, req.params.id);
+
+    if (!updated) {
+      res.sendStatus(404);
+      return;
+    }
+
+    res.json({
+      message: 'Cat updated.',
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({message: 'Could not update cat.'});
+  }
 };
 
-// Del the cat
-const deleteCat = (req, res) => {
-  res.json({
-    message: 'Cat item deleted.',
-  });
+const deleteCat = async (req, res) => {
+  try {
+    const deleted = await removeCat(req.params.id);
+
+    if (!deleted) {
+      res.sendStatus(404);
+      return;
+    }
+
+    res.json({
+      message: 'Cat deleted.',
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({message: 'Could not delete cat.'});
+  }
 };
 
-export {getCats, getCatById, postCat, putCat, deleteCat};
+export {getCats, getCatById, getCatsByUserId, postCat, putCat, deleteCat};

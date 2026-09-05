@@ -1,43 +1,90 @@
-import {listAllUsers, findUserById, addUser} from '../models/user-model.js';
+import {
+  listAllUsers,
+  findUserById,
+  addUser,
+  modifyUser,
+  removeUser,
+} from '../models/user-model.js';
 
-// Get all users
-const getUsers = (req, res) => {
-  res.json(listAllUsers());
-};
-
-const getUserById = (req, res) => {
-  const user = findUserById(req.params.id);
-
-  if (user) {
-    res.json(user);
-  } else {
-    res.sendStatus(404);
+const getUsers = async (req, res) => {
+  try {
+    const users = await listAllUsers();
+    res.json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({message: 'Could not get users.'});
   }
 };
 
-const postUser = (req, res) => {
-  const result = addUser(req.body);
+const getUserById = async (req, res) => {
+  try {
+    const user = await findUserById(req.params.id);
 
-  if (result.user_id) {
+    if (!user) {
+      res.sendStatus(404);
+      return;
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({message: 'Could not get user.'});
+  }
+};
+
+const postUser = async (req, res) => {
+  try {
+    const result = await addUser(req.body);
+
+    if (!result) {
+      res.sendStatus(400);
+      return;
+    }
+
     res.status(201).json({
       message: 'New user added.',
       result,
     });
-  } else {
-    res.sendStatus(400);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({message: 'Could not add user.'});
   }
 };
 
-const putUser = (req, res) => {
-  res.json({
-    message: 'User item updated.',
-  });
+const putUser = async (req, res) => {
+  try {
+    const updated = await modifyUser(req.body, req.params.id);
+
+    if (!updated) {
+      res.sendStatus(404);
+      return;
+    }
+
+    res.json({
+      message: 'User updated.',
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({message: 'Could not update user.'});
+  }
 };
 
-const deleteUser = (req, res) => {
-  res.json({
-    message: 'User item deleted.',
-  });
+const deleteUser = async (req, res) => {
+  try {
+    const deleted = await removeUser(req.params.id);
+
+    if (!deleted) {
+      res.sendStatus(404);
+      return;
+    }
+
+    res.json({
+      message: 'User deleted.',
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({message: 'Could not delete user.'});
+  }
 };
 
 export {getUsers, getUserById, postUser, putUser, deleteUser};

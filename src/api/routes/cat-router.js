@@ -5,6 +5,7 @@ import {createThumbnail} from '../../middlewares/upload.js';
 import {
   getCats,
   getCatById,
+  getCatsByUserId,
   postCat,
   putCat,
   deleteCat,
@@ -18,6 +19,8 @@ catRouter
   .route('/')
   .get(getCats)
   .post(upload.single('cat'), createThumbnail, postCat);
+
+catRouter.get('/user/:id', getCatsByUserId);
 
 catRouter.route('/:id').get(getCatById).put(putCat).delete(deleteCat);
 

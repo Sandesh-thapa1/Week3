@@ -1,0 +1,99 @@
+GET http://localhost:3000/api/v1/cats
+
+
+###
+
+GET http://localhost:3000/api/v1/cats/user/37
+
+
+
+###
+
+GET http://localhost:3000/api/v1/cats/41
+
+
+
+###
+
+POST http://localhost:3000/api/v1/cats
+Content-Type: multipart/form-data; boundary=CatBoundary
+
+--CatBoundary
+Content-Disposition: form-data; name="cat_name"
+
+Milo
+--CatBoundary
+Content-Disposition: form-data; name="weight"
+
+4.5
+--CatBoundary
+Content-Disposition: form-data; name="owner"
+
+37
+--CatBoundary
+Content-Disposition: form-data; name="birthdate"
+
+2022-05-10
+--CatBoundary
+Content-Disposition: form-data; name="cat"; filename="cat.jpg"
+Content-Type: image/jpeg
+
+< ../public/cat.jpg
+--CatBoundary--
+
+
+
+###
+
+GET http://localhost:3000/api/v1/cats/43
+
+
+###
+
+PUT http://localhost:3000/api/v1/cats/43
+Content-Type: application/json
+
+{
+  "cat_name": "Milo Updated",
+  "weight": 5
+}
+
+###
+
+DELETE http://localhost:3000/api/v1/cats/43
+
+###
+
+POST http://localhost:3000/api/v1/cats
+Content-Type: multipart/form-data; boundary=CatBoundary
+
+--CatBoundary
+Content-Disposition: form-data; name="cat_name"
+
+Delete Test Cat
+--CatBoundary
+Content-Disposition: form-data; name="weight"
+
+4
+--CatBoundary
+Content-Disposition: form-data; name="owner"
+
+39
+--CatBoundary
+Content-Disposition: form-data; name="birthdate"
+
+2023-01-01
+--CatBoundary
+Content-Disposition: form-data; name="cat"; filename="cat.jpg"
+Content-Type: image/jpeg
+
+< ../public/cat.jpg
+--CatBoundary--
+
+###
+
+DELETE http://localhost:3000/api/v1/users/39
+
+###
+
+GET http://localhost:3000/api/v1/cats/44
