@@ -8,33 +8,33 @@ import {
   removeUser,
 } from '../models/user-model.js';
 
-const getUsers = async (req, res) => {
+const getUsers = async (req, res, next) => {
   try {
     const users = await listAllUsers();
     res.json(users);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({message: 'Could not get users.'});
+    next(error);
   }
 };
 
-const getUserById = async (req, res) => {
+const getUserById = async (req, res, next) => {
   try {
     const user = await findUserById(req.params.id);
 
     if (!user) {
-      res.sendStatus(404);
+      const error = new Error('User not found');
+      error.status = 404;
+      next(error);
       return;
     }
 
     res.json(user);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({message: 'Could not get user.'});
+    next(error);
   }
 };
 
-const postUser = async (req, res) => {
+const postUser = async (req, res, next) => {
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
@@ -47,7 +47,9 @@ const postUser = async (req, res) => {
     const result = await addUser(newUser);
 
     if (!result) {
-      res.sendStatus(400);
+      const error = new Error('Could not add user');
+      error.status = 400;
+      next(error);
       return;
     }
 
@@ -56,19 +58,19 @@ const postUser = async (req, res) => {
       result,
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({message: 'Could not add user.'});
+    next(error);
   }
 };
 
-const putUser = async (req, res) => {
+const putUser = async (req, res, next) => {
   try {
     const loggedInUser = res.locals.user;
     const userId = Number(req.params.id);
 
-    // Normal user can update only themselves
     if (loggedInUser.role !== 'admin' && loggedInUser.user_id !== userId) {
-      res.sendStatus(403);
+      const error = new Error('Not allowed');
+      error.status = 403;
+      next(error);
       return;
     }
 
@@ -76,7 +78,6 @@ const putUser = async (req, res) => {
       delete req.body.role;
     }
 
-    // Hash password if user changes it
     if (req.body.password) {
       req.body.password = await bcrypt.hash(req.body.password, 10);
     }
@@ -84,7 +85,9 @@ const putUser = async (req, res) => {
     const updated = await modifyUser(req.body, userId);
 
     if (!updated) {
-      res.sendStatus(404);
+      const error = new Error('User not found');
+      error.status = 404;
+      next(error);
       return;
     }
 
@@ -92,26 +95,28 @@ const putUser = async (req, res) => {
       message: 'User updated.',
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({message: 'Could not update user.'});
+    next(error);
   }
 };
 
-const deleteUser = async (req, res) => {
+const deleteUser = async (req, res, next) => {
   try {
     const loggedInUser = res.locals.user;
     const userId = Number(req.params.id);
 
-    // Normal user can delete only themselves
     if (loggedInUser.role !== 'admin' && loggedInUser.user_id !== userId) {
-      res.sendStatus(403);
+      const error = new Error('Not allowed');
+      error.status = 403;
+      next(error);
       return;
     }
 
     const deleted = await removeUser(userId);
 
     if (!deleted) {
-      res.sendStatus(404);
+      const error = new Error('User not found');
+      error.status = 404;
+      next(error);
       return;
     }
 
@@ -119,8 +124,7 @@ const deleteUser = async (req, res) => {
       message: 'User deleted.',
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({message: 'Could not delete user.'});
+    next(error);
   }
 };
 

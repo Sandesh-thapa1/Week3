@@ -1,8 +1,10 @@
 import express from 'express';
-import multer from 'multer';
+import {body} from 'express-validator';
 
-import {createThumbnail} from '../../middlewares/upload.js';
+import {upload, createThumbnail} from '../../middlewares/upload.js';
+
 import {authenticateToken} from '../../middlewares/authentication.js';
+import {validationErrors} from '../../middlewares/error-handlers.js';
 
 import {
   getCats,
@@ -15,19 +17,70 @@ import {
 
 const catRouter = express.Router();
 
-const upload = multer({dest: 'uploads/'});
-
 catRouter
   .route('/')
   .get(getCats)
-  .post(upload.single('cat'), createThumbnail, postCat);
+  .post(
+    authenticateToken,
+
+    upload.single('file'),
+
+    body('cat_name')
+      .trim()
+      .isLength({min: 3, max: 50})
+      .withMessage('Cat name must be 3-50 characters'),
+
+    body('weight').isFloat().withMessage('Weight must be a number').toFloat(),
+
+    body('owner').isInt().withMessage('Owner must be an integer').toInt(),
+
+    body('birthdate')
+      .trim()
+      .isISO8601()
+      .withMessage('Birthdate must be a valid date'),
+
+    validationErrors,
+    createThumbnail,
+    postCat
+  );
 
 catRouter.get('/user/:id', getCatsByUserId);
 
 catRouter
   .route('/:id')
   .get(getCatById)
-  .put(authenticateToken, putCat)
+
+  .put(
+    authenticateToken,
+
+    body('cat_name')
+      .optional()
+      .trim()
+      .isLength({min: 3, max: 50})
+      .withMessage('Cat name must be 3-50 characters'),
+
+    body('weight')
+      .optional()
+      .isFloat()
+      .withMessage('Weight must be a number')
+      .toFloat(),
+
+    body('owner')
+      .optional()
+      .isInt()
+      .withMessage('Owner must be an integer')
+      .toInt(),
+
+    body('birthdate')
+      .optional()
+      .trim()
+      .isISO8601()
+      .withMessage('Birthdate must be a valid date'),
+
+    validationErrors,
+    putCat
+  )
+
   .delete(authenticateToken, deleteCat);
 
 export default catRouter;

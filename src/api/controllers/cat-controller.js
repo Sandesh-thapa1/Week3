@@ -7,52 +7,58 @@ import {
   removeCat,
 } from '../models/cat-model.js';
 
-const getCats = async (req, res) => {
+const getCats = async (req, res, next) => {
   try {
     const cats = await listAllCats();
     res.json(cats);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({message: 'Could not get cats.'});
+    next(error);
   }
 };
 
-const getCatById = async (req, res) => {
+const getCatById = async (req, res, next) => {
   try {
     const cat = await findCatById(req.params.id);
 
     if (!cat) {
-      res.sendStatus(404);
+      const error = new Error('Cat not found');
+      error.status = 404;
+      next(error);
       return;
     }
 
     res.json(cat);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({message: 'Could not get cat.'});
+    next(error);
   }
 };
 
-const getCatsByUserId = async (req, res) => {
+const getCatsByUserId = async (req, res, next) => {
   try {
     const cats = await findCatsByUserId(req.params.id);
     res.json(cats);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({message: 'Could not get user cats.'});
+    next(error);
   }
 };
 
-const postCat = async (req, res) => {
+const postCat = async (req, res, next) => {
   try {
-    if (req.file) {
-      req.body.filename = req.file.filename;
+    if (!req.file) {
+      const error = new Error('Invalid or missing file');
+      error.status = 400;
+      next(error);
+      return;
     }
+
+    req.body.filename = req.file.filename;
 
     const result = await addCat(req.body);
 
     if (!result) {
-      res.sendStatus(400);
+      const error = new Error('Could not add cat');
+      error.status = 400;
+      next(error);
       return;
     }
 
@@ -61,12 +67,11 @@ const postCat = async (req, res) => {
       result,
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({message: 'Could not add cat.'});
+    next(error);
   }
 };
 
-const putCat = async (req, res) => {
+const putCat = async (req, res, next) => {
   try {
     if (req.file) {
       req.body.filename = req.file.filename;
@@ -75,7 +80,9 @@ const putCat = async (req, res) => {
     const updated = await modifyCat(req.body, req.params.id, res.locals.user);
 
     if (!updated) {
-      res.sendStatus(404);
+      const error = new Error('Cat not found or not allowed');
+      error.status = 404;
+      next(error);
       return;
     }
 
@@ -83,17 +90,18 @@ const putCat = async (req, res) => {
       message: 'Cat updated.',
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({message: 'Could not update cat.'});
+    next(error);
   }
 };
 
-const deleteCat = async (req, res) => {
+const deleteCat = async (req, res, next) => {
   try {
     const deleted = await removeCat(req.params.id, res.locals.user);
 
     if (!deleted) {
-      res.sendStatus(404);
+      const error = new Error('Cat not found or not allowed');
+      error.status = 404;
+      next(error);
       return;
     }
 
@@ -101,8 +109,7 @@ const deleteCat = async (req, res) => {
       message: 'Cat deleted.',
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({message: 'Could not delete cat.'});
+    next(error);
   }
 };
 

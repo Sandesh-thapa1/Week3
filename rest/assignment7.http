@@ -1,0 +1,137 @@
+### Test empty user
+POST http://localhost:3000/api/v1/users
+Content-Type: application/json
+
+{}
+
+### Test empty user
+POST http://localhost:3000/api/v1/users
+Content-Type: application/json
+
+{}
+
+### Test invalid user data
+POST http://localhost:3000/api/v1/users
+Content-Type: application/json
+
+{
+  "name": "A",
+  "username": "a!",
+  "email": "wrong-email",
+  "password": "123"
+}
+
+### Login
+# @name login
+POST http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "hashtestuser",
+  "password": "test123"
+}
+
+
+### Test empty cat
+POST http://localhost:3000/api/v1/cats
+Authorization: Bearer {{login.response.body.token}}
+Content-Type: multipart/form-data; boundary=TestBoundary
+
+--TestBoundary
+Content-Disposition: form-data; name="cat_name"
+
+
+--TestBoundary
+Content-Disposition: form-data; name="weight"
+
+
+--TestBoundary
+Content-Disposition: form-data; name="owner"
+
+
+--TestBoundary
+Content-Disposition: form-data; name="birthdate"
+
+
+--TestBoundary--
+
+
+### Test cat with missing file
+POST http://localhost:3000/api/v1/cats
+Authorization: Bearer {{login.response.body.token}}
+Content-Type: application/json
+
+{
+  "cat_name": "Test Cat",
+  "weight": 4.5,
+  "owner": 40,
+  "birthdate": "2020-05-10"
+}
+
+### Test invalid file type
+POST http://localhost:3000/api/v1/cats
+Authorization: Bearer {{login.response.body.token}}
+Content-Type: multipart/form-data; boundary=TestBoundary
+
+--TestBoundary
+Content-Disposition: form-data; name="cat_name"
+
+Test Cat
+--TestBoundary
+Content-Disposition: form-data; name="weight"
+
+4.5
+--TestBoundary
+Content-Disposition: form-data; name="owner"
+
+40
+--TestBoundary
+Content-Disposition: form-data; name="birthdate"
+
+2020-05-10
+--TestBoundary
+Content-Disposition: form-data; name="file"; filename="package.json"
+Content-Type: application/json
+
+< ../package.json
+--TestBoundary--
+
+
+
+### Test file larger than 10 MB
+POST http://localhost:3000/api/v1/cats
+Authorization: Bearer {{login.response.body.token}}
+Content-Type: multipart/form-data; boundary=TestBoundary
+
+--TestBoundary
+Content-Disposition: form-data; name="cat_name"
+
+Big Test Cat
+--TestBoundary
+Content-Disposition: form-data; name="weight"
+
+4.5
+--TestBoundary
+Content-Disposition: form-data; name="owner"
+
+40
+--TestBoundary
+Content-Disposition: form-data; name="birthdate"
+
+2020-05-10
+--TestBoundary
+Content-Disposition: form-data; name="file"; filename="big-test.jpg"
+Content-Type: image/jpeg
+
+< ../big-test.jpg
+--TestBoundary--
+
+### Test route not found
+GET http://localhost:3000/api/v1/does-not-exist
+
+
+### Test empty login
+POST http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+
+{}
