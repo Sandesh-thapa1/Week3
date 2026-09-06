@@ -1,6 +1,6 @@
 # Week3 Express REST API
 
-Express.js REST API project containing Week 3 Assignments.
+Express.js REST API project containing Week 3.
 
 ## Assignments
 
@@ -17,7 +17,7 @@ Express.js REST API project containing Week 3 Assignments.
 ### Assignment 3
 
 - File upload using Multer
-- Uploaded files stored in the uploads folder
+- Uploaded files stored in the `uploads` folder
 
 ### Assignment 4
 
@@ -55,19 +55,51 @@ Express.js REST API project containing Week 3 Assignments.
 - Maximum file upload size of 10 MB
 - 404 error handling
 
+## API Routes
+
+### Cat Routes
+
+- GET `/api/v1/cats`
+- GET `/api/v1/cats/:id`
+- GET `/api/v1/cats/user/:id`
+- POST `/api/v1/cats`
+- PUT `/api/v1/cats/:id`
+- DELETE `/api/v1/cats/:id`
+
+### User Routes
+
+- GET `/api/v1/users`
+- GET `/api/v1/users/:id`
+- POST `/api/v1/users`
+- PUT `/api/v1/users/:id`
+- DELETE `/api/v1/users/:id`
+
+### Authentication Routes
+
+- POST `/api/v1/auth/login`
+- GET `/api/v1/auth/me`
+
+For cat uploads, use `multipart/form-data` with the file field name `file`.
+
 ## Authentication
 
 Users can log in using:
-POST /api/v1/auth/login
+
+`POST /api/v1/auth/login`
+
 A successful login returns a JWT token.
+
 Protected routes use:
-Authorization: Bearer <token>
+
+`Authorization: Bearer <token>`
+
 The logged-in user can be checked using:
-GET /api/v1/auth/me
+
+`GET /api/v1/auth/me`
 
 ## Authorization Rules
 
-### Regular user
+### Regular User
 
 - Can update their own user information.
 - Can delete their own user account.
