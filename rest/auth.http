@@ -1,0 +1,14 @@
+### Login
+# @name login
+POST http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "hashtestuser",
+  "password": "test123"
+}
+
+###
+
+GET http://localhost:3000/api/v1/auth/me
+Authorization: Bearer {{login.response.body.token}}

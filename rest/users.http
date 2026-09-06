@@ -47,3 +47,66 @@ Content-Type: application/json
   "email": "deletetest@example.com",
   "password": "test123"
 }
+
+
+###
+
+POST http://localhost:3000/api/v1/users
+Content-Type: application/json
+
+{
+  "name": "Hash Test User",
+  "username": "hashtestuser",
+  "email": "hashtest@example.com",
+  "password": "test123"
+}
+
+###
+
+# @name userLogin
+POST http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "hashtestuser",
+  "password": "test123"
+}
+
+###
+
+PUT http://localhost:3000/api/v1/users/40
+Content-Type: application/json
+Authorization: Bearer {{userLogin.response.body.token}}
+
+{
+  "name": "Hash Test User Updated"
+}
+###
+
+PUT http://localhost:3000/api/v1/users/37
+Content-Type: application/json
+Authorization: Bearer {{userLogin.response.body.token}}
+
+{
+  "name": "Should Not Change"
+}
+
+###
+
+DELETE http://localhost:3000/api/v1/users/37
+Authorization: Bearer {{userLogin.response.body.token}}
+
+###
+
+PUT http://localhost:3000/api/v1/users/37
+Content-Type: application/json
+Authorization: Bearer {{userLogin.response.body.token}}
+
+{
+  "name": "Admin Updated User"
+}
+
+###
+
+DELETE http://localhost:3000/api/v1/users/41
+Authorization: Bearer {{userLogin.response.body.token}}

@@ -1,3 +1,5 @@
+import bcrypt from 'bcrypt';
+
 import {
   listAllUsers,
   findUserById,
@@ -34,7 +36,15 @@ const getUserById = async (req, res) => {
 
 const postUser = async (req, res) => {
   try {
-    const result = await addUser(req.body);
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
+    const newUser = {
+      ...req.body,
+      password: hashedPassword,
+      role: 'user',
+    };
+
+    const result = await addUser(newUser);
 
     if (!result) {
       res.sendStatus(400);
@@ -53,7 +63,25 @@ const postUser = async (req, res) => {
 
 const putUser = async (req, res) => {
   try {
-    const updated = await modifyUser(req.body, req.params.id);
+    const loggedInUser = res.locals.user;
+    const userId = Number(req.params.id);
+
+    // Normal user can update only themselves
+    if (loggedInUser.role !== 'admin' && loggedInUser.user_id !== userId) {
+      res.sendStatus(403);
+      return;
+    }
+
+    if (loggedInUser.role !== 'admin') {
+      delete req.body.role;
+    }
+
+    // Hash password if user changes it
+    if (req.body.password) {
+      req.body.password = await bcrypt.hash(req.body.password, 10);
+    }
+
+    const updated = await modifyUser(req.body, userId);
 
     if (!updated) {
       res.sendStatus(404);
@@ -71,7 +99,16 @@ const putUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
   try {
-    const deleted = await removeUser(req.params.id);
+    const loggedInUser = res.locals.user;
+    const userId = Number(req.params.id);
+
+    // Normal user can delete only themselves
+    if (loggedInUser.role !== 'admin' && loggedInUser.user_id !== userId) {
+      res.sendStatus(403);
+      return;
+    }
+
+    const deleted = await removeUser(userId);
 
     if (!deleted) {
       res.sendStatus(404);

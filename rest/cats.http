@@ -97,3 +97,148 @@ DELETE http://localhost:3000/api/v1/users/39
 ###
 
 GET http://localhost:3000/api/v1/cats/44
+
+
+###
+
+POST http://localhost:3000/api/v1/cats
+Content-Type: multipart/form-data; boundary=CatBoundary
+
+--CatBoundary
+Content-Disposition: form-data; name="cat_name"
+
+Auth Test Cat
+--CatBoundary
+Content-Disposition: form-data; name="weight"
+
+4
+--CatBoundary
+Content-Disposition: form-data; name="owner"
+
+40
+--CatBoundary
+Content-Disposition: form-data; name="birthdate"
+
+2023-05-10
+--CatBoundary
+Content-Disposition: form-data; name="cat"; filename="cat.jpg"
+Content-Type: image/jpeg
+
+< ../public/cat.jpg
+--CatBoundary--
+
+
+
+###
+
+# @name catLogin
+POST http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "hashtestuser",
+  "password": "test123"
+}
+
+###
+
+PUT http://localhost:3000/api/v1/cats/45
+Content-Type: application/json
+Authorization: Bearer {{catLogin.response.body.token}}
+
+{
+  "cat_name": "Auth Test Cat Updated",
+  "weight": 5
+}
+
+
+###
+
+PUT http://localhost:3000/api/v1/cats/41
+Content-Type: application/json
+Authorization: Bearer {{catLogin.response.body.token}}
+
+{
+  "cat_name": "Should Not Change"
+}
+
+
+###
+
+DELETE http://localhost:3000/api/v1/cats/41
+Authorization: Bearer {{catLogin.response.body.token}}
+
+
+###
+
+DELETE http://localhost:3000/api/v1/cats/45
+Authorization: Bearer {{catLogin.response.body.token}}
+
+###
+
+# @name adminLogin
+POST http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "hashtestuser",
+  "password": "test123"
+}
+
+###
+
+PUT http://localhost:3000/api/v1/cats/41
+Content-Type: application/json
+Authorization: Bearer {{adminLogin.response.body.token}}
+
+{
+  "cat_name": "Admin Updated Cat"
+}
+
+###
+
+POST http://localhost:3000/api/v1/cats
+Content-Type: multipart/form-data; boundary=CatBoundary
+
+--CatBoundary
+Content-Disposition: form-data; name="cat_name"
+
+Admin Delete Test
+--CatBoundary
+Content-Disposition: form-data; name="weight"
+
+4
+--CatBoundary
+Content-Disposition: form-data; name="owner"
+
+37
+--CatBoundary
+Content-Disposition: form-data; name="birthdate"
+
+2023-01-01
+--CatBoundary
+Content-Disposition: form-data; name="cat"; filename="cat.jpg"
+Content-Type: image/jpeg
+
+< ../public/cat.jpg
+--CatBoundary--
+
+###
+
+DELETE http://localhost:3000/api/v1/cats/46
+Authorization: Bearer {{adminLogin.response.body.token}}
+
+
+###
+
+POST http://localhost:3000/api/v1/users
+Content-Type: application/json
+
+{
+  "name": "Admin Delete User",
+  "username": "admindeletetest",
+  "email": "admindeletetest@example.com",
+  "password": "test123"
+}
+
+###

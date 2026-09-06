@@ -72,7 +72,7 @@ const putCat = async (req, res) => {
       req.body.filename = req.file.filename;
     }
 
-    const updated = await modifyCat(req.body, req.params.id);
+    const updated = await modifyCat(req.body, req.params.id, res.locals.user);
 
     if (!updated) {
       res.sendStatus(404);
@@ -90,7 +90,7 @@ const putCat = async (req, res) => {
 
 const deleteCat = async (req, res) => {
   try {
-    const deleted = await removeCat(req.params.id);
+    const deleted = await removeCat(req.params.id, res.locals.user);
 
     if (!deleted) {
       res.sendStatus(404);
